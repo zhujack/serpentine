@@ -7,7 +7,7 @@ rule addrg:
     input:
         "TEMP/{unit}.novo.bam"
     output:
-        "TEMP/{unit}.unit.bam"
+        temp("TEMP/{unit}.unit.bam")
     version: "1.119"
     params:
         batch ="-l nodes=1:gpfs -q ccr",
@@ -50,7 +50,7 @@ rule novoalign:
         index=lambda wildcards: SERPENTINE_HOME+"/resources/mapping/novoindex_"+ config['novoVersion'] +"/"+config['reference']+".index",
         fastq=lambda wildcards: config["units"][wildcards.unit]
     output:
-        "TEMP/{unit}.novo.bam"
+        temp("TEMP/{unit}.novo.bam")
     version: config['novoVersion']
     params:
         batch ="-l nodes=1:gpfs -q ccr",
