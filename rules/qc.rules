@@ -1,6 +1,3 @@
-
-
-
 """
 rulues for generating QC metrics and summarizing QC metrics
 """
@@ -14,9 +11,7 @@ rule qcSum:
         outDir="STUDY/" + config['reference'] + "." + config['aligner'] + "/qc"
     shell: "echo {params.outDir}; do_qcSummaryFiles.R -I {params.metricsPatterns} -O {params.outDir} -T dupmetrics,summetrics,hsmetrics,qscoremetrics"
 
-
-
-
+## not working yet
 # rule fastqcSum:
 #     """
 #     summarize fastqc at different levels for comparizon purpose
@@ -33,40 +28,6 @@ rule qcSum:
 #     shell:
 # """
 # ...
-# """
-
-# rule fastqc:
-#     """
-#     fastqc data files will be saved to the same dir as the fastq files
-#     """
-#     input:
-#         "{prefix}.fastq.gz"
-#     output:
-#         "{prefix}_fastqc.zip"
-#     params:
-#         batch = '-l nodes=1:gpfs -q ccr'
-#     version: "0.11.2"
-#     log: "{prefix}_fastqc.log"
-#     threads: 8
-#     shell: """
-# module load fastqc/{version}
-# fastqc {input} > {log} 2>&1
-# """
-
-# rule bamDepth:
-#     input:
-#         bam="{base}/bam/{sample}.final.bam",
-#         bai="{base}/bam/{sample}.final.bam.bai"
-#     output:
-#         "{base}/qc/{sample}.final.bam.depth"
-#     params:
-#         batch="-l nodes=1:gpfs ",
-#         targets_interval_list = lambda wildcards: config['genomic_intervals'][wildcards.sample],
-#         outDir = "{base}/qc"
-#     version: "2.19.0"
-#     shell: """
-# module load bedtools/{version}
-# /home/bin/bamDepth.sh {input.bam} {params.targets_interval_list} {params.outDir} "
 # """
 
 
@@ -153,7 +114,6 @@ module load bedtools/{version}
 /home/zhujack/bin/readDepth.sh {input.bam} {params.genomic_intervals} {params.outDir}
 """
 
-
 rule bamqc:
     input: 
         bam="{base}/bam/{sample}.final.bam",
@@ -212,7 +172,5 @@ METRIC_ACCUMULATION_LEVEL=ALL_READS \
 REFERENCE_SEQUENCE={input.reference} \
 QUIET=true  \
 VALIDATION_STRINGENCY=SILENT
-
 """
-#ln -fs {output} STUDY/{params.ref_name}.{params.aligner}/qc/{wildcards.sample}.final.bam.hsmmetrics
 
