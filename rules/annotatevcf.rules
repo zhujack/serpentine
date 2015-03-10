@@ -22,14 +22,14 @@ rule snpEff:
     shell: """
 module load snpEff/{version}
 java -Xmx16g -jar ${{SNPEFFHOME}}/SnpSift.jar \
-dbnsfp -a \
-{input.vcf} \
+dbnsfp \
+-c {params.snpEff_config} \
+-a {input.vcf} \
 | java -Xmx4g -jar ${{SNPEFFHOME}}/SnpSift.jar annotate {params.CosmicCodingMuts} /dev/stdin \
 | java -Xmx4g -jar ${{SNPEFFHOME}}/SnpSift.jar annotate {params.dbsnp} /dev/stdin \
 | java -Xmx4g -jar ${{SNPEFFHOME}}/SnpSift.jar annotate {params.clinvar} /dev/stdin \
 | java -Xmx4g -jar ${{SNPEFFHOME}}/SnpSift.jar  annotate {params.ESP_snps} /dev/stdin \
 | java -Xmx12g -jar ${{SNPEFFHOME}}/snpEff.jar \
--c {params.snpEff_config} \
 -s {output[0]} \
 -canon {params.snpEff_genome} > {output[1]}
 
