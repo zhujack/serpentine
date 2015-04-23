@@ -6,13 +6,13 @@ rulues for generating QC metrics and summarizing QC metrics
 """
 
 rule qcSum:
-    input: expand("{metricsBase}.{metricsType}", metricsBase=metricsBases, metricsType=['summetrics','quality_distribution_metrics','hsmetrics'])
+    input: expand("{metricsBase}.{metricsType}", metricsBase=metricsBases, metricsType=['coverage','summetrics','dupmetrics','quality_distribution_metrics','hsmetrics'])
     output: METRICS_summaries
     params: 
         batch=" -l  nodes=1:gpfs",
         metricsPatterns=lambda wc: ','.join(metricsBases),
         outDir="STUDY/" + config['reference'] + "." + config['aligner'] + "/qc"
-    shell: "echo {params.outDir}; do_qcSummaryFiles.R -I {params.metricsPatterns} -O {params.outDir} -T dupmetrics,summetrics,hsmetrics,qscoremetrics"
+    shell: "echo {params.outDir}; do_qcSummaryFiles.R -I {params.metricsPatterns} -O {params.outDir} -T coverage,dupmetrics,summetrics,hsmetrics,qscoremetrics"
 
 
 rule DepthOfCoverage:
@@ -162,11 +162,28 @@ module load samtools/{version}
 samtools flagstat {input[0]} > {output}
 """
 
+rule bamTools:
+    input: 
+        bam="{base}/bam/{sample}.final.bam",
+        bai="{base}/bam/{sample}.final.bam.bai"
+    output:
+        "{base}/qc/{sample}.final.bam.coverage"
+    params:
+        batch="-l nodes=1:gpfs ",
+        outDir="{base}/qc",
+        genomic_intervals=lambda wildcards: config['genomic_intervals'][wildcards.sample]
+    threads: 32
+    version: "Thu Jun 12 13:39:54 EDT 2014 on biowulf.nih.gov"
+    shell: """
+/home/zhujack/bin/bamTools coverage -overwrite -onlystats -nomerge {params.genomic_intervals} {output} {input.bam}
+"""
+
+
 rule sumDepth:
     input: 
         "{base}/qc/{sample}.final.bam.depth"
     output:
-        "{base}/qc/{sample}.final.bam.depth.baseCoverageByTranscript.txt"
+        "{base}/qc/{sample}.final.bam.baseCoverageByTranscript.txt"
     params:
         batch="-l nodes=1:gpfs ",
         outDir="{base}/qc",
@@ -175,22 +192,6 @@ rule sumDepth:
     shell: """
 module load R/devel
 /home/zhujack/bin/do_sumDepth.R -f {input} -o {params.outDir}
-"""
-
-rule bamTools:
-    input: 
-        bam="{base}/bam/{sample}.final.bam",
-        bai="{base}/bam/{sample}.final.bam.bai"
-    output:
-        "{base}/qc/{sample}.final.bam.covSum.txt"
-    params:
-        batch="-l nodes=1:gpfs ",
-        outDir="{base}/qc",
-        genomic_intervals=lambda wildcards: config['genomic_intervals'][wildcards.sample].replace('.merged', '')
-    threads: 32
-    version: "Thu Jun 12 13:39:54 EDT 2014 on biowulf.nih.gov"
-    shell: """
-/home/zhujack/bin/bamTools coverage -overwrite -onlystats -nomerge {params.genomic_intervals} {output} {input.bam}
 """
 
 

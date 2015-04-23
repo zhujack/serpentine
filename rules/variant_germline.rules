@@ -75,7 +75,8 @@ rule platypus:
     log: "{base}/platypus/{sample}.platypus.log"
     shell: """
 module load platypus/{version}
-python /data/ngs/usr/local/Platypus_{version}/Platypus.py callVariants \
+# python /data/ngs/usr/local/Platypus_{version}/Platypus.py callVariants \
+platypus.py callVariants \
 --nCPU={threads} \
 --bufferSize=1000000 \
 --maxReads=100000000 \

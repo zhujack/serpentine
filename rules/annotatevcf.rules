@@ -33,9 +33,12 @@ dbnsfp \
 -s {output[0]} \
 -canon {params.snpEff_genome} > {output[1]}
 
-#if [ ! -f {output[1]} ];then 
-#    touch {output[1]}
-#fi
+if [ ! -f {output[1]} ];then
+   touch {output[1]}
+fi
+if [ ! -f {output[0]} ];then
+   touch {output[0]}
+fi
 """
 
 # -f  Ensembl_transcriptid,Uniprot_acc,Interpro_domain,SIFT_score,Polyphen2_HVAR_pred,GERP++_NR,GERP++_RS,29way_logOdds,1000Gp1_AF,1000Gp1_AFR_AF,1000Gp1_EUR_AF,1000Gp1_AMR_AF,1000Gp1_ASN_AF,ESP6500_AA_AF,ESP6500_EA_AF,Polyphen2_HVAR_score
